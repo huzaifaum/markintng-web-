@@ -102,7 +102,7 @@ section{padding:6rem 5%;position:relative;z-index:1}
 
 /* ===== SERVICES ===== */
 .services{background:var(--dark)}
-.services-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;flex-wrap:gap;gap:2rem}
+.services-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;flex-wrap:wrap;gap:2rem}
 .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
 .service-card{background:var(--dark3);border:1px solid rgba(212,160,23,.1);border-radius:20px;padding:2rem;position:relative;overflow:hidden;transition:all .4s;cursor:default}
 .service-card::before{content:'';position:absolute;inset:0;background:var(--grad);opacity:0;transition:opacity .4s;z-index:0}
@@ -196,13 +196,16 @@ section{padding:6rem 5%;position:relative;z-index:1}
 .form-group{margin-bottom:1.2rem}
 .form-group label{display:block;font-size:.8rem;letter-spacing:.5px;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase}
 .form-group input,.form-group select,.form-group textarea{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(212,160,23,.12);border-radius:12px;padding:.85rem 1rem;color:var(--light);font-family:'DM Sans',sans-serif;font-size:.9rem;transition:border-color .3s;outline:none}
-.form-group input:focus,.form-group select,.form-group textarea:focus{border-color:var(--gold)}
-.form-group select{cursor:pointer;-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group select{cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8A9A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center}
+.form-group select option{background:#1A1A24;color:#F5F3EE}
 .form-group textarea{height:120px;resize:vertical}
 .form-submit{width:100%;padding:1rem;background:var(--grad);border:none;border-radius:40px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#000;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:.5rem}
 .form-submit:hover{box-shadow:0 10px 30px rgba(212,160,23,.4);transform:translateY(-2px)}
-.form-success{display:none;text-align:center;padding:2rem;color:var(--gold)}
-.form-success i{font-size:3rem;margin-bottom:1rem}
+.form-success{display:none;text-align:center;padding:3rem 2rem;color:var(--gold)}
+.form-success i{font-size:3.5rem;margin-bottom:1rem;display:block}
+.form-success h3{font-size:1.4rem;margin-bottom:.6rem;color:var(--light)}
+.form-success p{color:var(--muted);font-size:.95rem}
 
 /* ===== FOOTER ===== */
 footer{background:var(--dark2);border-top:1px solid rgba(212,160,23,.08);padding:4rem 5% 2rem}
@@ -231,14 +234,19 @@ footer{background:var(--dark2);border-top:1px solid rgba(212,160,23,.08);padding
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:768px){
-  .nav-links-desktop{display:none}
-  .hamburger{display:flex}
+  .nav-links-desktop{display:none!important}
+  .hamburger{display:flex!important}
   .hero{padding:7rem 5% 4rem}
   .hero-stats{gap:2rem}
   .services-header{flex-direction:column;align-items:flex-start}
   section{padding:4rem 5%}
+  .portfolio-grid{grid-template-columns:1fr!important}
+  .pricing-grid{grid-template-columns:1fr!important}
 }
-@media(min-width:769px){.hamburger{display:none}}
+@media(min-width:769px){
+  .hamburger{display:none!important}
+  .nav-links-desktop{display:flex!important}
+}
 </style>
 </head>
 <body>
@@ -299,15 +307,15 @@ footer{background:var(--dark2);border-top:1px solid rgba(212,160,23,.08);padding
     </div>
     <div class="hero-stats">
       <div class="stat">
-        <div class="stat-num" data-target="250">0</div>
+        <div class="stat-num" data-target="250" data-suffix="+">0</div>
         <div class="stat-label">Clients Served</div>
       </div>
       <div class="stat">
-        <div class="stat-num" data-target="98">0</div>
+        <div class="stat-num" data-target="98" data-suffix="%">0</div>
         <div class="stat-label">% Retention Rate</div>
       </div>
       <div class="stat">
-        <div class="stat-num" data-target="12">0</div>
+        <div class="stat-num" data-target="12" data-suffix="">0</div>
         <div class="stat-label">Awards Won</div>
       </div>
     </div>
@@ -764,7 +772,12 @@ document.querySelectorAll('a,button,.service-card,.review-card,.price-card,.port
 if('ontouchstart' in window){cursor.style.display='none';ring.style.display='none';}
 
 // ===== MOBILE MENU =====
-function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
+function toggleMenu(){
+  const menu=document.getElementById('mobileMenu');
+  menu.classList.toggle('open');
+  document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){const m=document.getElementById('mobileMenu');if(m.classList.contains('open')){m.classList.remove('open');document.body.style.overflow='';}}});
 
 // ===== SCROLL TO TOP =====
 const scrollTopBtn=document.getElementById('scrollTop');
@@ -773,22 +786,33 @@ window.addEventListener('scroll',()=>{scrollTopBtn.classList.toggle('visible',wi
 // ===== REVEAL ON SCROLL =====
 const reveals=document.querySelectorAll('.reveal');
 const observer=new IntersectionObserver(entries=>{
-  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);}});
-},{threshold:.1});
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+},{threshold:.08,rootMargin:'0px 0px -40px 0px'});
 reveals.forEach(el=>observer.observe(el));
 
 // ===== COUNTER ANIMATION =====
 function animateCounter(el,target){
-  let current=0;const step=target/60;
+  let current=0;const step=Math.max(1,target/80);
+  const suffix=el.dataset.suffix||'';
   const interval=setInterval(()=>{
     current+=step;
     if(current>=target){current=target;clearInterval(interval);}
-    el.textContent=Math.floor(current)+(el.dataset.target==='98'?'%':'+');
-  },30);
+    el.textContent=Math.floor(current)+suffix;
+  },25);
 }
 const statNums=document.querySelectorAll('.stat-num');
 const statsObserver=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){animateCounter(e.target,parseInt(e.target.dataset.target));statsObserver.unobserve(e.target);}});
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      animateCounter(e.target,parseInt(e.target.dataset.target));
+      statsObserver.unobserve(e.target);
+    }
+  });
 },{threshold:.5});
 statNums.forEach(el=>statsObserver.observe(el));
 
@@ -797,13 +821,26 @@ function submitForm(e){
   e.preventDefault();
   const form=document.getElementById('contactForm');
   const success=document.getElementById('formSuccess');
-  form.style.opacity='0';form.style.transform='translateY(-10px)';form.style.transition='all .4s';
-  setTimeout(()=>{form.style.display='none';success.style.display='block';},400);
+  form.style.transition='opacity .4s,transform .4s';
+  form.style.opacity='0';
+  form.style.transform='translateY(-10px)';
+  setTimeout(()=>{
+    form.style.display='none';
+    success.style.display='block';
+    success.style.opacity='0';
+    success.style.transition='opacity .5s';
+    requestAnimationFrame(()=>{success.style.opacity='1';});
+  },420);
 }
 
-// ===== MARQUEE DUPLICATE =====
-const track=document.getElementById('marqueeTrack');
-track.innerHTML+=track.innerHTML;
+// ===== MARQUEE DUPLICATE - run once only =====
+(function(){
+  const track=document.getElementById('marqueeTrack');
+  if(track && !track.dataset.duplicated){
+    track.innerHTML+=track.innerHTML;
+    track.dataset.duplicated='1';
+  }
+})();
 </script>
 </body>
 </html>
